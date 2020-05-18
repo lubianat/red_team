@@ -1,0 +1,184 @@
+# Notes about the code
+
+## demandy19a_analyses.Rmd
+
+### Hard to reproduce, code is not containerized
+
+* Name of the file is not clear as to what is in it. 
+
+- Good that the list of packages and their versions are available. 
+
+This is already better than 99% of the research code that is made available. 
+
+However, this is hard to reproduce perfectly, or at least very, very time consuming. 
+I use a slightly different R version (R version 3.6.3 (2020-02-29)), and slightly  different versions for R packages. 
+I will hope that they will function the same. That is what most people would do, if they were simply checking the code.. 
+
+
+Eventhough it is far from common use, containerized systems (like Docker) would improve the reproducibility of the code. 
+See https://dl.acm.org/doi/10.1145/2723872.2723882 (An introduction to Docker for reproducible research) as a reference
+for both computational reproducibility challenges and the use of Docker.
+
+
+### Best practices: rm(list = ls()) 
+
+` rm(list = ls()) `
+
+It is good that care was taken to clear the environment. This is not a best practice, 
+though, because many changes remain invisible and are not changed by this command. 
+It is something deemed "highly suggestive of a non-reproducible workflow". 
+See more about it in https://rstats.wtf/save-source.html#rm-list-ls ;
+
+
+
+### Best practices: unnecessary comments
+
+`
+# install (if necessary) and load packages
+  # function written by stevenworthington 
+`
+
+Two "code smells" that announce a good intent on keeping code clean, but are not best practices. 
+
+Both comments should not be needed. 
+
+1st -> The variables and functions should have meaningful names, and they need to tell the story, so what the code does is clear.
+
+2nd - > Information should not be on the code itself, but store in version management software (such Git and GitHub).
+This makes the whole traceable as to who wrote and modified all its parts.
+
+On "Clean Code" (2009. Clean Code: A Handbook of Agile Software Craftsmanship. Prentice Hall. ISBN 978-0132350884.),
+Robert Marting talks a lot about comments and similar issues (it is an intermediate-level reading, I'd say). 
+
+
+This also is true for a range of other comments:
+
+`
+# vector of necessary packages
+# vector of necessary packages
+
+
+`
+
+  
+
+
+### Best practices: function names not meaningful
+
+`
+  Ipak <- function(pkg){
+      new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+      
+      if (length(new.pkg)) 
+          install.packages(new.pkg, dependencies = TRUE)
+      
+      sapply(pkg, require, character.only = TRUE)
+  }
+`
+
+Ipak is not a clear name, and thus the commentary above was necessary. 
+
+A name such as "install_all_required_packages" would make it clearer.
+
+It might seem verbose, but it is much easier to read and understand
+and actually saves space, as the comments are not needed.
+
+
+
+
+### Best practices: comment not clear enough
+
+'''
+# allow for Type III SS
+options(contrasts = c("contr.sum", "contr.poly"))
+'''
+
+Comments like this one are necesary, but unclear. I do not know what Type III SS stands for. 
+I did my bachelor thesis on Type IV Secretion Systems, but I am sure that this is not what it stands for here. 
+
+So the abbreviation makes it ambiguous. It is also not clear how the options enable this, or what "allow for Type III SS" means.
+
+
+The example below (from the code) is actually a good example of a sucint, direct and unavoidable comment.
+`
+# turn scientific notation off
+options(scipen = 999)
+`
+
+
+### Best practices: code repetition
+
+Throughout the code, there is a lot of . This makes it more error prone, harder to understand, and harder to modify.
+
+For example: 
+
+`
+ggplot(DF.long, aes(x = happy, fill = trial)) +
+  geom_density(alpha = .6,
+               adjust = 3) +
+  labs(title = "Happy reports after each pose") +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank())
+
+ggplot(DF.long, aes(x = anger, fill = trial)) +
+  geom_density(alpha = .6,
+               adjust = 10) +
+  labs(title = "Anger reports after each pose") +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank())
+        
+        
+ggplot(DF.long, aes(x = feedb_awar_var, fill = demand)) +
+  geom_density(alpha = .6,
+               adjust = 1.5) +
+  labs(title = "Awareness of our interest in the ffh in each condition") +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank())
+`
+
+(20 lines, many repetitions)
+
+could become:
+
+
+`
+plot_density <- function(DF.long, x, fill, adjust, title){
+
+ggplot(DF.long, aes(x = x, fill = fill)) +
+  geom_density(alpha = .6,
+               adjust = adjust) +
+  labs(title = title) +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank())
+
+}
+
+plot_density(DF.long, x = happy, fill = trial, adjust = 3, title = "Happy reports after each pose")
+
+plot_density(DF.long, x = anger, fill = trial, adjust = 10, title = "Anger reports after each pose")
+
+plot_density(DF.long, x = feedb_awar_var, fill = demand, adjust = 1.5, title = "Awareness of our interest in the ffh in each condition")
+`
+
+(16 lines, way less repetition)
+
+This makes the intent of each plot clearer, as well as makes it easier to understand differences between them .
+
+
+
+
+### Best practices: variable names not clear enough
+
+Variables like "indiv_gend_var" and "feedb_blef_var" are not clear as what they mean. That adds a lot of burden on the code reader to understand what is going on.
+
+Moreover, adding "_var" to the end of a variable is not necessary, and adds clutter.
+
+
+
+
+
+
+
+
+
+

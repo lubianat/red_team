@@ -1,0 +1,1079 @@
+---
+title: "Are the effects of facial feedback on emotional feeling solely driven by demand characteristics? An experimental investigation"
+author: "Nicholas A. Coles"
+date: "April 13, 2020"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+# Readme
+Code for the study reported in 'Are the effects of facial feedback on emotional feeling solely drive n by demand characteristics? An experimental investigation' Coles et al. (under review; Psychological Science).
+
+If using RStudio and RMarkdown (which is recommended), press Ctrl + Shift + O to see the structure of the code.
+
+## Computational reproducibility details
+To get to the data processing and analysis code, you can skip to section titled "Setup R Environment". The information below is included to facilitate computational reproducibility (see Obels, Lakens, Coles, et al, 2020, AMPPS, for more details on computational reproducibility problems in science)
+
+### R Session Information
+R version 3.5.1 (2018-07-02)
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+Running under: Windows >= 8 x64 (build 9200)
+
+Matrix products: default
+
+locale:
+[1] LC_COLLATE=English_United States.1252  LC_CTYPE=English_United States.1252   
+[3] LC_MONETARY=English_United States.1252 LC_NUMERIC=C                          
+[5] LC_TIME=English_United States.1252    
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] emmeans_1.4.3.01       gridExtra_2.3          lmerTest_3.1-1        
+ [4] lme4_1.1-21            rmcorr_0.3.0           coin_1.3-1            
+ [7] ggpubr_0.2.4           magrittr_1.5           yarrr_0.1.5           
+[10] circlize_0.4.8         BayesFactor_0.9.12-4.2 Matrix_1.2-14         
+[13] coda_0.19-3            jpeg_0.1-8.1           car_3.0-5             
+[16] carData_3.0-3          rcompanion_2.3.7       psych_1.8.12          
+[19] forcats_0.4.0          stringr_1.4.0          dplyr_0.8.3           
+[22] purrr_0.3.3            readr_1.3.1            tidyr_1.0.0           
+[25] tibble_2.1.3           ggplot2_3.2.1          tidyverse_1.3.0       
+[28] multcomp_1.4-13        TH.data_1.0-10         MASS_7.3-51.4         
+[31] survival_2.42-3        mvtnorm_1.0-11        
+
+loaded via a namespace (and not attached):
+ [1] minqa_1.2.4         colorspace_1.4-1    ggsignif_0.6.0      ellipsis_0.3.0     
+ [5] modeltools_0.2-22   rio_0.5.16          estimability_1.3    GlobalOptions_0.1.1
+ [9] fs_1.3.1            rstudioapi_0.10     farver_2.0.1        MatrixModels_0.4-1 
+[13] fansi_0.4.0         lubridate_1.7.4     xml2_1.2.2          codetools_0.2-15   
+[17] splines_3.5.1       mnormt_1.5-5        libcoin_1.0-5       knitr_1.26         
+[21] zeallot_0.1.0       jsonlite_1.6        nloptr_1.2.1        broom_0.5.2        
+[25] dbplyr_1.4.2        compiler_3.5.1      httr_1.4.1          backports_1.1.5    
+[29] assertthat_0.2.1    lazyeval_0.2.2      cli_2.0.0           tools_3.5.1        
+[33] gtable_0.3.0        glue_1.3.1          Rcpp_1.0.3          cellranger_1.1.0   
+[37] vctrs_0.2.0         nlme_3.1-137        lmtest_0.9-37       xfun_0.11          
+[41] openxlsx_4.1.4      rvest_0.3.5         lifecycle_0.1.0     gtools_3.8.1       
+[45] zoo_1.8-6           scales_1.1.0        hms_0.5.2           parallel_3.5.1     
+[49] sandwich_2.5-1      expm_0.999-4        yaml_2.2.0          curl_4.3           
+[53] pbapply_1.4-2       EMT_1.1             stringi_1.4.3       nortest_1.0-4      
+[57] boot_1.3-20         zip_2.0.4           shape_1.4.4         rlang_0.4.2        
+[61] pkgconfig_2.0.3     matrixStats_0.55.0  lattice_0.20-38     labeling_0.3       
+[65] tidyselect_0.2.5    plyr_1.8.5          R6_2.4.1            DescTools_0.99.31  
+[69] generics_0.0.2      multcompView_0.1-7  DBI_1.0.0           pillar_1.4.2       
+[73] haven_2.2.0         foreign_0.8-70      withr_2.1.2         abind_1.4-5        
+[77] modelr_0.1.5        crayon_1.3.4        utf8_1.1.4          grid_3.5.1         
+[81] readxl_1.3.1        data.table_1.12.8   digest_0.6.23       reprex_0.3.0       
+[85] xtable_1.8-4        numDeriv_2016.8-1.1 stats4_3.5.1        munsell_0.5.0
+
+## Setup R environment
+```{r message = FALSE, results = "hide"}
+# clear environment
+
+rm(list = ls())
+
+# install (if necessary) and load packages
+  # function written by stevenworthington 
+  Ipak <- function(pkg){
+      new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+      
+      if (length(new.pkg)) 
+          install.packages(new.pkg, dependencies = TRUE)
+      
+      sapply(pkg, require, character.only = TRUE)
+  }
+
+  # vector of necessary packages
+  packages <- c("tidyverse", "psych", "rcompanion", "car", 
+                "ggplot2", "yarrr", "ggpubr", "coin",
+                "rmcorr", "lmerTest", "gridExtra", 
+                "emmeans")
+  
+  
+  # using vector of packages, call ipak function
+  Ipak(packages)
+  
+  # delete vestigial
+  rm(packages, Ipak)
+  
+# allow for Type III SS
+options(contrasts = c("contr.sum", "contr.poly"))
+  
+# turn scientific notation off
+options(scipen = 999)
+```
+
+## Load data
+```{r}
+DF <- read.csv(file = "demandy19a_data_raw.csv")
+```
+
+## Clean data
+Select relevant variables in the data.frame
+```{r}
+DF %<>%
+  select(
+    # happy 1
+    happ1_emot_hap : happ1_emot_ann, happ1_supp_dif, happ1_supp_con,
+    # happy 2
+    happ2_emot_hap : happ2_emot_ann, happ2_supp_dif, happ2_supp_con, 
+    # anger 1
+    angr1_emot_hap : angr1_emot_ann, angr1_supp_dif, angr1_supp_con,
+    # anger 2
+    angr2_emot_hap : angr2_emot_ann, angr2_supp_dif, angr2_supp_con, 
+    # neutral 1
+    neut1_emot_hap : neut1_emot_ann, neut1_supp_dif, neut1_supp_con,
+    # neutral 2
+    neut2_emot_hap : neut2_emot_ann, neut2_supp_dif, neut2_supp_con,
+    
+    # individual differences self-reports
+    indiv_gend_var, indiv_agee_var : indiv_maia_032,
+    
+    # experiment information
+    exper_init_var, exper_ssid_var, demand,
+    
+    # awareness
+    feedb_awar_var : heard_awar_var,
+    
+    # order variables
+    FL_5_DO, FL_6_DO,
+    
+    # experimenter notes
+    exper_note_var
+    )
+```
+
+Rename order variables
+```{r}
+DF %<>%
+  rename(block1.order = FL_5_DO,
+         block2.order = FL_6_DO)
+```
+
+Remove blank trials and practice trials (subid's in the 900's)
+```{r}
+DF %<>%
+  filter(!is.na(exper_ssid_var),
+         exper_ssid_var < 900,
+         !is.na(happ1_emot_hap))
+```
+
+For belief in facial feedback hypothesis, code -1's as NA. This -1 option was confusing for experimenters, but was supposed to be reserved for instances where they were unsure what the participant's belief was.
+```{r}
+DF[DF$feedb_blef_var == -1, ]$feedb_blef_var <- NA
+```
+
+### Fix subject ID entry errors
+Note: these errors don't affect any of the analyses or results. But they do help me identify participants' paper records.
+
+On 11/03 MAM accidentally assigned subect 131 the subject id '120'
+```{r}
+DF[DF$exper_ssid_var == 120 & 
+   DF$exper_init_var == "MAM", ]$exper_ssid_var <- 131
+```
+
+On 11/17 MAM accidentally assigned subject 206 the subject id '204'
+```{r}
+DF[DF$exper_ssid_var == 204 & 
+   DF$exper_init_var == "MAM", ]$exper_ssid_var <- 206
+```
+
+On 11/19 TKA accidentally assigned subject 222 the subject id '223'
+```{r}
+DF[DF$exper_ssid_var == 223 & 
+   DF$exper_init_var == "TKA" &
+   DF$demand == "pos", ]$exper_ssid_var <- 222
+```
+
+On 01/22 KLP accidentally assigned subject 304 the subject id '303'
+```{r}
+DF[DF$exper_ssid_var == 303 & 
+   DF$exper_init_var == "KLP", ]$exper_ssid_var <- 304
+```
+
+### Center emotion responses at 0
+```{r}
+DF %<>%
+  mutate_at(.vars = vars(matches("emot")),
+            .funs = function(x){x - 1})
+```
+
+## Create wide- and long-format dataframes
+The code creates these two seperate formats because some functions are easier to run on wide vs. long formats.
+
+### Wide-format
+```{r message = FALSE}
+DF.wide <- DF  # data already in wide format
+```
+
+#### Wide-format: calculate happiness and anger ratings
+```{r message = FALSE}
+DF.wide %<>%
+  rowwise() %>%
+  mutate(# Happy pose 1 emotion ratings
+         happ1.happy = mean(c(happ1_emot_hap, 
+                              happ1_emot_sat, 
+                              happ1_emot_enj)),
+         happ1.anger = mean(c(happ1_emot_irr, 
+                              happ1_emot_agg,
+                              happ1_emot_ann)),
+
+         # Angry pose 1 emotion ratings
+         angr1.happy = mean(c(angr1_emot_hap, 
+                              angr1_emot_sat, 
+                              angr1_emot_enj)),
+         angr1.anger = mean(c(angr1_emot_irr, 
+                              angr1_emot_agg,
+                              angr1_emot_ann)),
+         
+         # Neutral pose 1 emotion ratings
+         neut1.happy = mean(c(neut1_emot_hap, 
+                              neut1_emot_sat, 
+                              neut1_emot_enj)),
+         neut1.anger = mean(c(neut1_emot_irr, 
+                              neut1_emot_agg,
+                              neut1_emot_ann)),
+         
+         # Happy pose 2 emotion ratings
+         happ2.happy = mean(c(happ2_emot_hap, 
+                              happ2_emot_sat, 
+                              happ2_emot_enj)),
+         happ2.anger = mean(c(happ2_emot_irr, 
+                              happ2_emot_agg,
+                              happ2_emot_ann)),
+
+         # Angry pose 2 emotion ratings
+         angr2.happy = mean(c(angr2_emot_hap, 
+                              angr2_emot_sat, 
+                              angr2_emot_enj)),
+         angr2.anger = mean(c(angr2_emot_irr, 
+                              angr2_emot_agg,
+                              angr2_emot_ann)),
+         
+         # Neutral pose 2 emotion ratings
+         neut2.happy = mean(c(neut2_emot_hap, 
+                              neut2_emot_sat, 
+                              neut2_emot_enj)),
+         neut2.anger = mean(c(neut2_emot_irr, 
+                              neut2_emot_agg,
+                              neut2_emot_ann)) 
+         ) %>% 
+  ungroup()
+```
+
+### Long-format
+Transpose data from wide to long format
+1. Gather all DV's into a single column
+2. Create seperate variables that identify the trial and outcome
+3. Spread outcomes into individual rows
+4. Arrange dataframe by subject id and outcome
+```{r}
+DF.long <- DF %>%
+  # (1)
+  gather(key = "dv", value = "value",
+         happ1_emot_hap : neut2_supp_con
+         ) %>%
+  # (2)
+  separate(col = "dv", into = c("trial", "outcome"),
+           sep = "_...._") %>%  # variable naming convention contains this seperator
+  # (3)
+  spread(key = "outcome", value = "value") %>%
+  # (4)
+  arrange(exper_ssid_var, trial)
+```
+
+#### Long-format: calculate happiness and anger ratings
+Calculate happiness and anger ratings
+```{r}
+DF.long %<>%
+  rowwise() %>%
+  mutate(anger = mean(c(agg, irr, ann)),
+         happy = mean(c(hap, sat, enj))
+         ) %>% 
+  ungroup()
+```
+
+#### Long-format: clean dataframe
+Calculate a block # variable
+```{r}
+DF.long %<>%
+  mutate(block.num = if_else(condition = trial == "angr1" |
+                                         trial == "happ1" |
+                                         trial == "neut1",
+                             true = 1,
+                             false = 2))
+```
+
+Now that we have a variable that indicates what block the trial was, we can create a new trial variable that removes the redundant information abuot block
+```{r}
+DF.long$trial <- as.factor(
+  gsub('.$', '', DF.long$trial))
+```
+
+Organize long dataframe
+```{r}
+DF.long %<>%
+  select(# subject-level variables
+          exper_init_var, exper_ssid_var, demand,
+          feedb_awar_var, feedb_blef_var, video_awar_var,
+          heard_awar_var,
+          
+          # block variables
+          block.num,
+          
+          # trial-level variables
+          trial, anger, happy,
+          hap, sat, enj,
+          agg, irr, ann, dif)
+```
+
+Delete original dataframe
+```{r}
+rm(DF)
+```
+
+Export cleaned dataframes
+```{r eval = FALSE}
+write.csv(x = DF.wide, 
+          file = "demandy19a_data_wide_clean.csv")
+
+write.csv(x = DF.long,
+          file = "demandy19a_data_long_clean.csv")
+```
+
+## Explore dataset
+### Demographics
+```{r}
+DF.wide$indiv_gend_var <- as.factor(DF.wide$indiv_gend_var)
+
+# calculate proportion of women and men
+DF.wide %>% 
+  group_by(indiv_gend_var) %>% 
+  summarise(no_rows = length(indiv_gend_var))
+
+# calculate age descriptives
+DF.wide %>% 
+  summarise(mean = mean(indiv_agee_var),
+            sd = sd(indiv_agee_var))
+```
+
+### Emotion responses
+#### Individual items
+##### Histograms
+Create histogram for each happiness item
+```{r}
+emo.hist <- list()
+
+for (emo in c("hap", "sat", "enj")){
+  emo.hist[[emo]] <- 
+    ggplot(DF.long, 
+           aes_string(x = emo,
+                      fill = "trial")) +
+    geom_histogram(binwidth = 1, 
+                   alpha= .6, 
+                   position= "identity") +
+    ylim(0, 500) +
+    theme(panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank())
+}
+
+# grid.arrange
+grid.arrange(emo.hist$hap, emo.hist$sat, emo.hist$enj,
+             top = "Individual happiness item reports after each trial")
+
+# delete vestigial
+rm(emo, emo.hist)
+```
+
+Create histogram for each anger item
+```{r}
+emo.hist <- list()
+
+for (emo in c("agg", "ann", "irr")){
+  emo.hist[[emo]] <- 
+    ggplot(DF.long, 
+           aes_string(x = emo,
+                      fill = "trial")) +
+    geom_histogram(binwidth = 1, 
+                   alpha= .6, 
+                   position= "identity") +
+    ylim(0, 500) +
+    theme(panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank())
+}
+
+# grid.arrange
+grid.arrange(emo.hist$agg, emo.hist$ann, emo.hist$irr,
+             top = "Individual anger item reports reports after each trial")
+
+# delete vestigial
+rm(emo, emo.hist)
+```
+
+##### Internal reliability
+Since participants provide reports for the emotion items six times (three trials * two blocks), we will examine their correlations seperately for each trial and block.
+```{r}
+# create a blank dataframe to paste results in
+alpha.DF <- data.frame(block.num = factor(), 
+                       trial = factor(), 
+                       alpha.h = numeric(),
+                       alpha.a = numeric())
+
+# loop through each trial and block and calculate alpha for the happiness and anger scores
+for (trial in unique(DF.long$trial)){
+  for (block.num in unique(DF.long$block.num)) {
+    # happy items alpha
+    alpha.h <-
+      DF.long[DF.long$trial == trial & 
+          DF.long$block.num == block.num, ] %>%
+      select(hap, sat, enj) %>%
+      alpha()
+      
+    # anger items alpha  
+    alpha.a <-
+      DF.long[DF.long$trial == trial & 
+          DF.long$block.num == block.num, ] %>% 
+      select(agg, irr, ann) %>%
+      alpha()
+    
+    # save results to dataframe
+    alpha.DF <- rbind(alpha.DF,
+                      cbind(block.num = block.num,
+                            trial = trial,
+                            alpha.h = alpha.h[["total"]][["raw_alpha"]],
+                            alpha.a = alpha.a[["total"]][["raw_alpha"]]
+                            )
+                      )
+  }
+}
+
+# View reliability for every trial and block combination
+## View(alpha.DF)
+
+# calculate reliability for happiness and anger items overall
+alpha.DF %>% 
+  mutate(alpha.h = as.numeric(as.character(alpha.h)),
+         alpha.a = as.numeric(as.character(alpha.a))
+         ) %>% 
+  summarise(alpha.h.avg = mean(alpha.h),
+            alpha.a.avg = mean(alpha.a))
+
+# delete vestigial
+rm(alpha.a, alpha.DF, alpha.h, block.num, trial)
+```
+
+```{r warning = FALSE}
+# happy items (alpha = .92)
+DF.long %>%
+  select(hap, sat, enj) %>%
+  alpha()
+
+# anger items (alpha = .89)
+DF.long %>%
+  select(agg, irr, ann) %>%
+  alpha()
+
+# delete individual emotion items
+DF.long %<>%
+  select(-c(hap : ann))
+```
+
+### Emotion scales
+#### Happiness density plot
+```{r}
+ggplot(DF.long, aes(x = happy, fill = trial)) +
+  geom_density(alpha = .6,
+               adjust = 3) +
+  labs(title = "Happy reports after each pose") +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank())
+```
+
+#### Anger density plot
+```{r}
+ggplot(DF.long, aes(x = anger, fill = trial)) +
+  geom_density(alpha = .6,
+               adjust = 10) +
+  labs(title = "Anger reports after each pose") +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank())
+```
+
+## Manipulation checks
+### Aware of ffh
+Visualize distributions
+```{r}
+ggplot(DF.long, aes(x = feedb_awar_var, fill = demand)) +
+  geom_density(alpha = .6,
+               adjust = 1.5) +
+  labs(title = "Awareness of our interest in the ffh in each condition") +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank())
+```
+
+Analyses
+```{r}
+# ANOVA
+awar.aov <- aov(feedb_awar_var ~ demand,
+              data = DF.wide)
+summary(awar.aov)
+
+# pairwise comparisons with unadjusted p-values
+emmeans(awar.aov, pairwise ~ demand,
+        infer = c(TRUE, TRUE),
+        adjust = "none")
+
+# raw group Ms and SDs
+DF.long %>%
+  group_by(demand) %>%
+  summarise(mean = mean(feedb_awar_var),
+            sd = sd(feedb_awar_var))
+
+rm(awar.aov)
+```
+
+### Belief in ffh
+Visualize distributions
+```{r}
+ggplot(DF.long, aes(x = feedb_blef_var, fill = demand)) +
+  geom_density(alpha = .6,
+               adjust = 1.5) +
+  labs(title = "Belief in the ffh in each condition") +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank())
+```
+
+Analyses
+```{r}
+# ANOVA
+blef.aov <- aov(feedb_blef_var ~ demand,
+                data = DF.wide)
+summary(blef.aov)
+
+# pairwise comparisons with unadjusted p-values
+emmeans(blef.aov, pairwise ~ demand,
+        infer = c(TRUE, TRUE),
+        adjust = "none")
+
+# raw group Ms and SDs
+DF.long %>%
+  group_by(demand) %>%
+  summarise(mean = mean(feedb_blef_var,
+                        na.rm = TRUE),
+            sd = sd(feedb_blef_var,
+                    na.rm = TRUE))
+
+rm(blef.aov)
+```
+
+## Confirmatory analyses
+Convert subject id and block.num to a factor
+```{r}
+DF.long$exper_ssid_var <- as.factor(DF.long$exper_ssid_var)
+
+DF.long$block.num <- as.factor(DF.long$block.num)
+```
+
+### Happiness scores
+Full model. 
+
+Note: model will not converge if random effects are included
+```{r}
+h.lmer.full <- lmer(happy ~ trial * demand * block.num +
+                      (1 | exper_ssid_var),
+                    data = DF.long)
+
+summary(h.lmer.full)
+anova(h.lmer.full)
+```
+
+Decompose main effects
+```{r}
+# trial
+lsmeansLT(h.lmer.full, which =  "trial", pairwise = TRUE)
+
+DF.long %>%
+    group_by(trial) %>%
+    summarise(mean = mean(happy),
+              sd = sd(happy))
+
+# demand
+lsmeansLT(h.lmer.full, which =  "demand", pairwise = TRUE)
+
+DF.long %>%
+    group_by(demand) %>%
+    summarise(mean = mean(happy),
+              sd = sd(happy))
+
+# block.num
+lsmeansLT(h.lmer.full, which =  "block.num", pairwise = TRUE)
+
+DF.long %>%
+    group_by(block.num) %>%
+    summarise(mean = mean(happy),
+              sd = sd(happy))
+```
+
+Decompose trial:demand interaction
+```{r}
+joint_tests(h.lmer.full, by = "demand")
+
+emmeans(h.lmer.full, pairwise ~ trial | demand,
+        infer = c(TRUE, TRUE),
+        adjust = "none")
+
+DF.long %>%
+    group_by(demand, trial) %>%
+    summarise(mean = mean(happy),
+              sd = sd(happy))
+```
+
+Decompose trial:block interaction
+```{r}
+joint_tests(h.lmer.full, by = "block.num")
+```
+
+```{r}
+rm(h.lmer.full)
+```
+
+### Anger scores
+Same model structure as happiness. Similar results if fully random model is fit.
+```{r}
+a.lmer.full <- lmer(anger ~ trial * demand * block.num +
+                      (1 | exper_ssid_var),
+                    data = DF.long)
+summary(a.lmer.full)
+anova(a.lmer.full)
+```
+
+Decompose main effects
+```{r}
+# trail effects
+lsmeansLT(a.lmer.full, which =  "trial", pairwise = TRUE)
+
+DF.long %>%
+    group_by(trial) %>%
+    summarise(mean = mean(anger),
+              sd = sd(anger))
+
+# demand effects
+lsmeansLT(a.lmer.full, which =  "demand", pairwise = TRUE)
+
+DF.long %>%
+    group_by(demand) %>%
+    summarise(mean = mean(anger),
+              sd = sd(anger))
+
+# block number effects
+lsmeansLT(a.lmer.full, which =  "block.num", pairwise = TRUE)
+
+DF.long %>%
+    group_by(block.num) %>%
+    summarise(mean = mean(anger),
+              sd = sd(anger))
+```
+
+Decompose trial:demand effect
+```{r}
+joint_tests(a.lmer.full, by = "demand")
+
+emmeans(a.lmer.full, pairwise ~ trial | demand,
+        infer = c(TRUE, TRUE),
+        adjust = "none")
+
+DF.long %>%
+    group_by(demand, trial) %>%
+    summarise(mean = mean(anger),
+              sd = sd(anger))
+```
+
+```{r}
+rm(a.lmer.full)
+```
+
+### Figure 1
+```{r}
+# create a matrix of summary statistics
+  ## happy self-reports
+  smry.h <- DF.long %>%
+    group_by(demand, trial) %>%
+    summarise(mean = mean(happy),
+              sd = sd(happy),
+              n_obs = n(),
+              se = sd(happy)/sqrt(n())
+              )
+  ## anger self-reports
+  smry.a <- DF.long %>%
+    group_by(demand, trial) %>%
+    summarise(mean = mean(anger),
+              sd = sd(anger),
+              n_obs = n(),
+              se = sd(anger)/sqrt(n())
+              )
+
+  ## combine matrices 
+  smry <- rbind(cbind(dv = rep("Self-reported happiness", 9), 
+                      smry.h),
+                cbind(dv = rep("Self-reported anger", 9), 
+                      smry.a)
+                )
+  rm(smry.a, smry.h)
+  
+  ## re-order and re-name facets
+  smry$dv <- factor(smry$dv,
+                    levels = c("Self-reported happiness",
+                               "Self-reported anger"))
+  
+  smry$trial <- factor(smry$trial, 
+                       levels = c("happ", "neut","angr"))
+  levels(smry$trial)[levels(smry$trial)=="happ"] <- "happy"
+  levels(smry$trial)[levels(smry$trial)=="neut"] <- "neutral"
+  levels(smry$trial)[levels(smry$trial)=="angr"] <- "angry"
+  
+  smry$demand <- factor(smry$demand, 
+                        levels = c("pos", "neu","neg"))
+  levels(smry$demand)[levels(smry$demand)=="pos"] <- 
+    "positive expectation"
+  levels(smry$demand)[levels(smry$demand)=="neu"] <- 
+    "control"
+  levels(smry$demand)[levels(smry$demand)=="neg"] <- 
+    "null expectation"
+  
+# plot
+ggplot(smry, aes(trial, mean)) +
+  facet_grid(dv ~ demand, switch = "y", 
+             scales = "free_x") +
+  geom_col(width = .80, fill = "grey69", colour = "black") +
+  geom_errorbar(aes(ymin = mean - se,
+                    ymax = mean + se,
+                    width = 0.2)) +
+  labs(y = NULL, x = "Facial expression pose") +
+  ylim(0, 2) +
+  theme_classic() +
+  theme(strip.placement = "outside",
+        strip.background.y = element_blank(),
+        #strip.background.x = element_blank(),
+        #strip.background.x = element_rect(colour = "black",
+        #                                  fill = "white"),
+        strip.text.y = element_text(size = 10),
+        axis.title.x.bottom = element_text(size = 10))
+
+rm(smry)
+```
+
+## Exploratory analysesc
+### Examine whether difficulty varied by trial and block
+Note: models will not converge with random slopes
+```{r}
+d.lmer.full <- lmer(dif ~ trial * demand * block.num +
+                      (1 | exper_ssid_var),
+                    data = DF.long)
+summary(d.lmer.full)
+anova(d.lmer.full)
+
+# decompose trial effect
+lsmeansLT(d.lmer.full, which =  "trial", pairwise = TRUE)
+
+DF.long %>%
+    group_by(trial) %>%
+    summarise(mean = mean(dif),
+              sd = sd(dif))
+
+# decompose demand effect
+lsmeansLT(d.lmer.full, which =  "demand", pairwise = TRUE)
+
+DF.long %>%
+    group_by(demand) %>%
+    summarise(mean = mean(dif),
+              sd = sd(dif))
+```
+
+```{r}
+rm(d.lmer.full)
+```
+
+#### Re-examine happy pose effects controlling for difficulty
+```{r}
+h.d.lmer.full <- lmer(happy ~ (dif + trial + demand + block.num 
+                               + trial:demand) + (1 | exper_ssid_var),
+                      data = DF.long)
+summary(h.d.lmer.full)
+anova(h.d.lmer.full)
+```
+
+Decompose trial * demand effect
+```{r}
+joint_tests(h.d.lmer.full, by = "demand")
+
+emmeans(h.d.lmer.full, pairwise ~ trial | demand,
+        infer = c(TRUE, TRUE),
+        adjust = "none")
+```
+
+```{r}
+rm(h.d.lmer.full)
+```
+
+#### Re-examine anger pose effects controlling for difficulty
+```{r}
+a.d.lmer.full <- lmer(anger ~ (dif + trial + demand + block.num 
+                               + trial:demand) + (1 | exper_ssid_var),
+                      data = DF.long)
+summary(a.d.lmer.full)
+anova(a.d.lmer.full)
+```
+
+Decompose trial * demand effect
+```{r}
+joint_tests(a.d.lmer.full, by = "demand")
+
+emmeans(a.d.lmer.full, pairwise ~ trial | demand,
+        infer = c(TRUE, TRUE),
+        adjust = "none")
+```
+
+```{r}
+rm(a.d.lmer.full)
+```
+
+### Examine whether facial feedback effects are moderated by belief in the facial feedback hypothesis
+```{r}
+b.h.lmer <- lmer(happy ~ (trial + feedb_blef_var + block.num 
+                        + trial:feedb_blef_var) + (1 | exper_ssid_var),
+               data = DF.long)
+summary(b.h.lmer)
+anova(b.h.lmer)
+
+b.a.lmer <- lmer(anger ~ (trial + feedb_blef_var + block.num 
+                        + trial:feedb_blef_var) + (1 | exper_ssid_var),
+               data = DF.long)
+summary(b.a.lmer)
+anova(b.a.lmer)
+
+rm(b.h.lmer, b.a.lmer)
+```
+
+To decompose this interaction, make belief a high and low factor
+```{r}
+DF.long %<>% 
+  mutate(feedb_blef_nom = if_else(condition = feedb_blef_var > 2.15,
+                                  true = "high",
+                                  false = "low",
+                                  missing = NULL),
+         feedb_blef_nom = as.factor(feedb_blef_nom))
+```
+
+Re-fit models and decompose interaction
+```{r}
+b.h.lmer <- lmer(happy ~ (trial + feedb_blef_nom + block.num 
+                        + trial:feedb_blef_nom) + (1 | exper_ssid_var),
+               data = DF.long)
+summary(b.h.lmer)
+anova(b.h.lmer)
+
+# decompose trial by belief interaction
+joint_tests(b.h.lmer, by = "feedb_blef_nom")
+
+# delete vestigial
+rm(b.h.lmer)
+```
+
+```{r}
+b.a.lmer <- lmer(anger ~ (trial + feedb_blef_nom + block.num 
+                        + trial:feedb_blef_nom) + (1 | exper_ssid_var),
+               data = DF.long)
+summary(b.a.lmer)
+anova(b.a.lmer)
+
+# decompose trial by belief interaction
+joint_tests(b.a.lmer, by = "feedb_blef_nom")
+
+# delete vestigial
+rm(b.a.lmer)
+```
+
+## Calculate effect sizes
+To quantify the size of the pose effect in the positive expectation, control, and null expectations conditions, standardized mean difference scores were computed (Cohen’s drm; Cohen, 1988). For ease of comprehension, self-reported emotional experience was averaged across block and effect sizes were calculated as the mean difference between (a) the emotion-congruent pose and (b) the average of the emotion-incongruent poses. For example, to calculate the size of the effect of pose on happiness, we compared happiness scores between (a) the average of the two happy pose trials, and (b) the average of the two neutral pose and two angry pose trials.
+
+### Prep dataframe
+Create new dataframe
+```{r}
+DF.w.es <- DF.wide
+```
+
+Average across blocks
+```{r}
+DF.w.es <- DF.w.es %>%
+  rowwise() %>%
+  mutate(# happy trial ratings
+         happ.happy = mean(c(happ1.happy,
+                             happ2.happy)),
+         happ.anger = mean(c(happ1.anger,
+                             happ2.anger)),
+         
+         # angry trial ratings
+         angr.happy = mean(c(angr1.happy,
+                             angr2.happy)),
+         angr.anger = mean(c(angr1.anger,
+                             angr2.anger)),
+         
+         # neutral trial ratings
+         neut.happy = mean(c(neut1.happy,
+                             neut2.happy)),
+         neut.anger = mean(c(neut1.anger,
+                             neut2.anger))
+  ) %>%
+  ungroup() %>% 
+  # delete vestigial
+  select(-c(happ1.happy : neut2.anger))
+```
+
+Average across non-target trials
+```{r}
+DF.w.es <- DF.w.es %>%
+  rowwise() %>% 
+  mutate(# happiness scores for non-target trials (angr and neut)
+         angrneut.happy = mean(c(angr.happy, neut.happy)),
+         
+         # anger scores for non-target trials (happ and neut)
+         happneut.anger = mean(c(happ.anger, neut.anger))
+         ) %>% 
+  ungroup() %>% 
+  # delete vestigial
+  select(-c(angr.happy, neut.happy, happ.anger, neut.anger))
+```
+
+Pivot longer
+```{r}
+tmp <- DF.w.es %>% 
+  pivot_longer(cols = c(happ.happy, angrneut.happy),
+                names_to = "group",
+                values_to = "happiness") %>% 
+  select(exper_ssid_var, demand, group, happiness)
+
+tmp.dp <- tmp %>% 
+  filter(demand == "pos")
+
+cohen.d(formula = happiness ~ group | Subject(exper_ssid_var),
+        data = tmp.dp,
+        paired = TRUE,
+        within = TRUE)
+
+rm(tmp, tmp.dp)
+```
+
+Calculate difference between target and non-target trials
+```{r eval = FALSE}
+DF.w.es <- DF.w.es %>% 
+  rowwise() %>% 
+  mutate(# happiness facial feedback effect
+         happy.diff = happ.happy - angrneut.happy,
+         
+         # anger facial feedback effect
+         anger.diff = angr.anger - happneut.anger) %>% 
+  ungroup()
+```
+
+```{r}
+# formula: Cooper, Hedges, & Valentine, 2009; p. 229
+EsWitnMeanDiff <- function(m.diff, sd.diff, corr){
+  es <- (m.diff / sd.diff) * sqrt(2 * (1- corr));
+  return(es)
+}
+```
+
+#### Happy facial feedback effects
+Demand positive
+```{r}
+DF.w.pos.es <- DF.w.es %>%
+  filter(demand == "pos")
+
+
+
+# d = 1.19
+EsWitnMeanDiff(m.diff = mean(DF.w.pos.es$happy.diff),
+               sd.diff = sd(DF.w.pos.es$happy.diff),
+               corr = cor(DF.w.pos.es$happ.happy,
+                          DF.w.pos.es$angrneut.happy)
+               )
+
+rm(DF.w.pos.es)
+```
+
+Demand neutral
+```{r}
+DF.w.neu.es <- DF.w.es %>%
+  filter(demand == "neu")
+
+# d = 0.92
+EsWitnMeanDiff(m.diff = mean(DF.w.neu.es$happy.diff),
+               sd.diff = sd(DF.w.neu.es$happy.diff),
+               corr = cor(DF.w.neu.es$happ.happy,
+                          DF.w.neu.es$angrneut.happy)
+               )
+
+rm(DF.w.neu.es)
+```
+
+Demand negative
+```{r}
+DF.w.neg.es <- DF.w.es %>%
+  filter(demand == "neg")
+
+# d = 0.51
+EsWitnMeanDiff(m.diff = mean(DF.w.neg.es$happy.diff),
+               sd.diff = sd(DF.w.neg.es$happy.diff),
+               corr = cor(DF.w.neg.es$happ.happy,
+                          DF.w.neg.es$angrneut.happy)
+               )
+
+rm(DF.w.neg.es)
+```
+
+#### Anger facial feedback effects
+Demand positive
+```{r}
+DF.w.pos.es <- DF.w.es %>%
+  filter(demand == "pos")
+
+# d = 0.75
+EsWitnMeanDiff(m.diff = mean(DF.w.pos.es$anger.diff),
+               sd.diff = sd(DF.w.pos.es$anger.diff),
+               corr = cor(DF.w.pos.es$angr.anger,
+                          DF.w.pos.es$happneut.anger)
+               )
+
+rm(DF.w.pos.es)
+```
+
+Demand neutral
+```{r}
+DF.w.neu.es <- DF.w.es %>%
+  filter(demand == "neu")
+
+# d = 0.69
+EsWitnMeanDiff(m.diff = mean(DF.w.neu.es$anger.diff),
+               sd.diff = sd(DF.w.neu.es$anger.diff),
+               corr = cor(DF.w.neu.es$angr.anger,
+                          DF.w.neu.es$happneut.anger)
+               )
+
+rm(DF.w.neu.es)
+```
+
+Demand negative
+```{r}
+DF.w.neg.es <- DF.w.es %>%
+  filter(demand == "neg")
+
+# d = 0.34
+EsWitnMeanDiff(m.diff = mean(DF.w.neg.es$anger.diff),
+               sd.diff = sd(DF.w.neg.es$anger.diff),
+               corr = cor(DF.w.neg.es$angr.anger,
+                          DF.w.neg.es$happneut.anger)
+               )
+
+rm(DF.w.neg.es, EsWitnMeanDiff)
+```
