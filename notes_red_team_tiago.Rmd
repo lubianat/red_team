@@ -12,12 +12,11 @@ This is already better than 99% of the research code that is made available.
 
 However, this is hard to reproduce perfectly, or at least very, very time consuming. 
 I use a slightly different R version (R version 3.6.3 (2020-02-29)), and slightly  different versions for R packages. 
-I will hope that they will function the same. That is what most people would do, if they were simply checking the code.. 
+I will hope that they will function the same. That is what most people would do, if they were simply checking the code.
 
 
-Eventhough it is far from common use, containerized systems (like Docker) would improve the reproducibility of the code. 
-See https://dl.acm.org/doi/10.1145/2723872.2723882 (An introduction to Docker for reproducible research) as a reference
-for both computational reproducibility challenges and the use of Docker.
+Even though it is far from common use, containerized systems (like Docker) are poised to improve the reproducibility of the code . 
+See https://dl.acm.org/doi/10.1145/2723872.2723882 (An introduction to Docker for reproducible research) as a reference for both computational reproducibility challenges and the use of Docker.
 
 
 ### Best practices: rm(list = ls()) 
@@ -31,7 +30,7 @@ See more about it in https://rstats.wtf/save-source.html#rm-list-ls ;
 
 
 
-### Best practices: unnecessary comments
+### Best practices check: unnecessary comments
 
 `
 # install (if necessary) and load packages
@@ -48,15 +47,17 @@ Both comments should not be needed.
 This makes the whole traceable as to who wrote and modified all its parts.
 
 On "Clean Code" (2009. Clean Code: A Handbook of Agile Software Craftsmanship. Prentice Hall. ISBN 978-0132350884.),
-Robert Marting talks a lot about comments and similar issues (it is an intermediate-level reading, I'd say). 
+Robert Marting talks a lot about comments and similar issues (it is an intermediate-level reading, I would say, but very enlightening). 
 
 
-This also is true for a range of other comments:
+These two patterns can be seen throughout the code too.
+
+For example:
 
 `
-# vector of necessary packages
-# vector of necessary packages
-
+# grid.arrange
+grid.arrange(emo.hist$hap, emo.hist$sat, emo.hist$enj,
+             top = "Individual happiness item reports after each trial")
 
 `
 
@@ -106,9 +107,13 @@ options(scipen = 999)
 `
 
 
-### Best practices: code repetition
+### Best practices check: code repetition
 
-Throughout the code, there is a lot of . This makes it more error prone, harder to understand, and harder to modify.
+Throughout the code, there is a lot of code repetition.
+
+This makes it more error prone, harder to understand, and harder to modify.
+
+It is a classic "code smell". It does not affect the analysis per se, but incresases the likelihood of a bug going undetected.
 
 For example: 
 
@@ -164,7 +169,7 @@ plot_density(DF.long, x = feedb_awar_var, fill = demand, adjust = 1.5, title = "
 
 This makes the intent of each plot clearer, as well as makes it easier to understand differences between them .
 
-
+(The function above was not tested, it is a theoretical example)
 
 
 ### Best practices: variable names not clear enough
@@ -174,7 +179,12 @@ Variables like "indiv_gend_var" and "feedb_blef_var" are not clear as what they 
 Moreover, adding "_var" to the end of a variable is not necessary, and adds clutter.
 
 
-
+### Error: 
+Error in DF %<>% select(happ1_emot_hap:happ1_emot_ann, happ1_supp_dif,  : 
+  could not find function "%<>%"
+  
+The package needed to run the funcion is not called previously.  This makes it impossible to run the code and to check the downstream code..
+  
 
 
 

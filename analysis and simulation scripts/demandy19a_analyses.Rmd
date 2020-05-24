@@ -69,6 +69,7 @@ loaded via a namespace (and not attached):
 
 ## Setup R environment
 ```{r message = FALSE, results = "hide"}
+
 # clear environment
 
 rm(list = ls())
@@ -106,12 +107,13 @@ options(scipen = 999)
 
 ## Load data
 ```{r}
-DF <- read.csv(file = "demandy19a_data_raw.csv")
+DF <- read.csv(file = "data/demandy19a_data_raw.csv")
 ```
 
 ## Clean data
 Select relevant variables in the data.frame
 ```{r}
+library(magrittr)
 DF %<>%
   select(
     # happy 1
@@ -265,7 +267,7 @@ DF.wide %<>%
 ### Long-format
 Transpose data from wide to long format
 1. Gather all DV's into a single column
-2. Create seperate variables that identify the trial and outcome
+2. Create separate variables that identify the trial and outcome
 3. Spread outcomes into individual rows
 4. Arrange dataframe by subject id and outcome
 ```{r}
